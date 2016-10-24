@@ -14,7 +14,7 @@ BOT_NAME = 'tutorial'
 SPIDER_MODULES = ['tutorial.spiders']
 NEWSPIDER_MODULE = 'tutorial.spiders'
 
-#MONGO_URI = 'localhost:27017'
+MONGO_URI = 'localhost:27107'
 MONGO_DATABASE = 'Tab_Store'
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'tutorial (+http://www.yourdomain.com)'

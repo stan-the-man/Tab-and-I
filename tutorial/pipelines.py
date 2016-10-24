@@ -34,6 +34,7 @@ class TabPipeline(object):
         self.client.close()
 
     def process_item(self, item, spider):
+        print self.db[self.collection_name].find_one({'song': item['song'], 'artist': item['artist']})
         if not self.db[self.collection_name].find_one(
                     {'song': item['song'], 'artist': item['artist']}):
             self.db[self.collection_name].insert(dict(item))
