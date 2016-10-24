@@ -23,8 +23,8 @@ class tabSpider(scrapy.Spider):
         item['capo'] = "No Capo"
         item['tab'] = response.xpath('//pre[@class="js-tab-content"]').extract()
         title = response.xpath('//title/text()').extract()[0]
-        item['song'] = re.search('.*?(?= TAB)', title).group(0)
-        item['artist'] = re.search('(?<=by ).*?(?= @)', title).group(0)
+        item['song'] = re.search('.*?(?= TAB)', title).group(0).lower()
+        item['artist'] = re.search('(?<=by ).*?(?= @)', title).group(0).lower()
         item['tab_author'] = response.xpath('//div[@class="t_dtde"]/a/@href').extract()
 
         if response.xpath('//div[@class="t_dt"]').re('Tuning'):
