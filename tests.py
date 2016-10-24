@@ -1,4 +1,4 @@
-from helpers import Tab, play_tab, SpotifyAccess
+from helpers import Tab, play_tab, SpotifyAccess, TabAndI
 import json
 
 class TestTab(object):
@@ -100,15 +100,40 @@ class TestSpotifyAccess(object):
     def test_get_tempo(self):
         self.spotify.get_song_tempo('5CQ30WqJwcep0pYcV4AMNc') == 482
 
+
+class TestTabAndI(object):
+    def __init__(self):
+        self.tab = TabAndI()
+
+    def test_mongo_connection(self):
+        assert self.tab.mongo.myCollection.find_one()['x'] == 1
+
+    def test_find_tab(self):
+        song = 'STAIRWAY TO HEAVEN'
+        artist = 'Led Zeppelin'
+        # should print the tab
+        assert self.tab.get_tab_from_mongo(song=song, artist=artist)['artist'] == artist
+        assert self.tab.get_tab_from_mongo(song=song)['artist'] == artist
+        assert self.tab.get_tab_from_mongo() == None
+
+    def test_play_tab_from_mongo(self):
+        song = 'STAIRWAY TO HEAVEN'
+        artist = 'Led Zeppelin'
+        raw_tab_info = self.tab.get_tab_from_mongo(song=song, artist=artist)
+
+        tab = Tab(raw_tab_info)
+        play_tab(tab, .02, 30)
+
 test_tab = TestTab()
 test_spotify = TestSpotifyAccess()
+test_tab_and_i = TestTabAndI()
 
 test_tab.test_import()
 test_tab.test_separate_lines()
 test_tab.test_strings()
 test_tab.test_slice()
 test_tab.test_order_strings()
-test_tab.test_printing()
+#test_tab.test_printing()
 TestTab().test_length()
 
 test_spotify.test_connection_to_spotify()
@@ -116,3 +141,7 @@ test_spotify.test_information()
 test_spotify.test_get_playlist()
 test_spotify.test_urls_to_scrape()
 test_spotify.test_get_tempo()
+
+test_tab_and_i.test_mongo_connection()
+test_tab_and_i.test_find_tab()
+#test_tab_and_i.test_play_tab_from_mongo()

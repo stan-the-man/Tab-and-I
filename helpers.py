@@ -6,8 +6,12 @@ import spotipy.util
 from tutorial.settings import MONGO_DATABASE
 from tutorial.spiders import ug_spider
 from scrapy.crawler import CrawlerProcess
+from pymongo import MongoClient
 
 # Things to do:
+
+# Shit I have accomplished:
+
 # [x] move output.json into this repo
 # [x] find a way to deal with the line separations for each key.
 # [x] make sure that line separations are done by the keys found... 
@@ -25,16 +29,27 @@ from scrapy.crawler import CrawlerProcess
 # [x] successfully access spotify through spotipy
 # [x] access the correct playlist to get the songs for scrapping
 # [x] get the song information (in this case I need tempo)
-# [] connect to the mongo DB to get the new songs.
-# [] explore a cache system to see if anything has changed for scraping
-# [] play a tab from the mongo DB instead of the output.json
-# [] build an interface to select the song I want
-# [] edit the spotipy source code so that I can get the other info available from echonest
-# [] clean up the way SpotifyAccess handles the info
-# [] figure out a way to link the tempo to the timing of how the tab is presented
-# [] explore ways to link this information to a frontend application
 # [x] create a DB that holds all the songs I have already scraped
 # [x] store all info in a mongoDB to make this robust and scalable.
+# [x] connect to the mongo DB to get the new songs.
+# [x] play a tab from the mongo DB instead of the output.json
+
+# Things to do with Mongo DB
+
+# [] explore a cache system to see if anything has changed for scraping
+# [] make sure that all information that goes in to the DB is uniform
+# [] scrape for new songs from spotify and add them to mongo tests
+
+# Things to do with the Interface
+
+# [] build an interface to select the song I want
+# [] explore ways to link this information to a frontend application
+
+# Things to do with Spotify
+
+# [] clean up the way SpotifyAccess handles the info
+# [] edit the spotipy source code so that I can get the other info available from echonest
+# [] figure out a way to link the tempo to the timing of how the tab is presented
 
 # main url for tabs website that I scrape
 MAIN_URL = 'https://tabs.ultimate-guitar.com/'
@@ -113,13 +128,19 @@ def get_artist_and_song_from_input():
 
 class TabAndI(object):
     username = 'Stan Whitcomb'
-    tabs_collection_name = 'Tab_Store'
+    tabs_db_name = 'Tab_Store'
+    tabs_collection_name = 'tabs'
     songs_collection_name = 'songs'
 
     def __init__(self):
         self.spotify = SpotifyAccess(self.username)
         self.mongo_uri = None
         self.mongo_db = MONGO_DATABASE
+
+    @property
+    def mongo(self):
+        client = MongoClient('localhost', 27107)
+        return client[self.tabs_db_name]
 
     # this access spotify to get the current list of songs
     # then scrapes any new songs for tabs and adds them to the DB
@@ -128,7 +149,7 @@ class TabAndI(object):
         urls = self.spotify.get_urls_to_scrape_from_spotify(artist_song_list)
         self.crawl_url_list(urls)
 
-    # takes a set of new urls and gets the ones that are new
+    # takes a set of new urls and gets the ones that have not been seen before
     # using symetric difference of sets.
     def only_new_urls(self, urls):
         # access DB that holds list of urls
@@ -147,6 +168,15 @@ class TabAndI(object):
         process.crawl(spider)
         process.start()
 
+    # gets a tab given a song name, an artist name, or both.
+    # for artist name will return a single song from that artist.
+    def get_tab_from_mongo(self, song=None, artist=None):
+        query = {}
+        if song:
+            query['song'] = song
+        if artist:
+            query['artist'] = artist
+        return None if query == {} else self.mongo.tabs.find_one(query)
 
 def play_tab(tab, timing, window):
         start = 0
