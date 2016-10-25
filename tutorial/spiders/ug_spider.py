@@ -3,19 +3,15 @@ import re
 from tutorial.items import TabItem
 
 
-# what it do with this segment of the project?
-# [] need to put the information into a DB that allows me to access
-# [] need to test how well it functions.
-# [] are there any unit tests I can write?
+# old start urls. I think these are mucking up my call from helpers.py
+#'https://tabs.ultimate-guitar.com/m/metallica/nothing_else_matters_tab.htm',
+#'https://tabs.ultimate-guitar.com/l/led_zeppelin/stairway_to_heaven_tab.htm'
 
 
 class tabSpider(scrapy.Spider):
     name = 'tabs'
     allowed_domains = ['ultimate-guitar.com']
-    start_urls = [
-        'https://tabs.ultimate-guitar.com/m/metallica/nothing_else_matters_tab.htm',
-        'https://tabs.ultimate-guitar.com/l/led_zeppelin/stairway_to_heaven_tab.htm'
-    ]
+    start_urls = []
 
     def parse(self, response):
         item = TabItem()

@@ -4,7 +4,7 @@ import re
 import spotipy
 import spotipy.util
 from tutorial.settings import MONGO_DATABASE
-from tutorial.spiders import ug_spider
+from scrapy.utils.project import get_project_settings
 from scrapy.crawler import CrawlerProcess
 from pymongo import MongoClient
 
@@ -33,12 +33,21 @@ from pymongo import MongoClient
 # [x] store all info in a mongoDB to make this robust and scalable.
 # [x] connect to the mongo DB to get the new songs.
 # [x] play a tab from the mongo DB instead of the output.json
+# [x] scrape for new songs from spotify and add them to mongo tests
+
+# Things to do generally
+
+# [] handle case where cant find a tab
+        # currently I error out on the conversion to a Tab feature
+        # I may want to return a Tab construct from that search
+        # instead of a DB file.
 
 # Things to do with Mongo DB
 
 # [] explore a cache system to see if anything has changed for scraping
 # [] make sure that all information that goes in to the DB is uniform
-# [] scrape for new songs from spotify and add them to mongo tests
+        # for this I will have to delete the Nothing Else Matters and
+        # Stairway to Heaven entries and re-scrape
 
 # Things to do with the Interface
 
@@ -161,11 +170,9 @@ class TabAndI(object):
     # creates a spider and sets it start urls as the given urls
     # then crawls with that spider.
     def crawl_url_list(self, urls):
-        spider = ug_spider.tabSpider()
-        spider.start_urls = list(self.only_new_urls(urls))
 
-        process = CrawlerProcess()
-        process.crawl(spider)
+        process = CrawlerProcess(get_project_settings())
+        process.crawl('tabs', start_urls=list(self.only_new_urls(urls)))
         process.start()
 
     # gets a tab given a song name, an artist name, or both.

@@ -124,9 +124,32 @@ class TestTabAndI(object):
         tab = Tab(raw_tab_info)
         play_tab(tab, .02, 30)
 
+    def test_crawler(self):
+        self.tab.crawl_url_list([u'https://tabs.ultimate-guitar.com/m/metallica/blackened_tab.htm'])
+        artist = 'metallica'
+        song = 'blackened'
+        tab = Tab(self.tab.get_tab_from_mongo(song=song, artist=artist))
+        
+        assert tab.artist == artist
+        assert tab.song == song
+
+class TestEndToEnd(object):
+    def __init__(self):
+        self.tab = TabAndI()
+
+    def run(self):
+        self.tab.check_n_scrape()
+
+# currently all printing and end to end tests work.
+# scraped and can extract any of the songs in the given 
+# playlist. Super dope. Have those tests commented out as
+# they are not necessecary to run unless I am doing end to end
+# testing.
+
 test_tab = TestTab()
 test_spotify = TestSpotifyAccess()
 test_tab_and_i = TestTabAndI()
+test_end_to_end = TestEndToEnd()
 
 test_tab.test_import()
 test_tab.test_separate_lines()
@@ -145,3 +168,6 @@ test_spotify.test_get_tempo()
 test_tab_and_i.test_mongo_connection()
 test_tab_and_i.test_find_tab()
 #test_tab_and_i.test_play_tab_from_mongo()
+#test_tab_and_i.test_crawler()
+
+#test_end_to_end.run()
